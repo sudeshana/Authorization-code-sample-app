@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import { AUTH_CONFIG } from '../Config';
 
-//const API_URL = 'http://10.0.75.1:8280/pizzashack/1.0.0';
 const API_URL = 'https://localhost:8243/pizzashack/1.0.0';
 
 class Menu extends Component {
@@ -33,7 +32,6 @@ class Menu extends Component {
             .then(response => this.setState({ menuItems: response.data }))
             .catch(error =>{ 
                                 if(error.response.status === 401 && this.getRefreshToken() !== null){
-                                    console.log("try with refresh token");
 
                                     var options = {
                                         method: 'POST',
@@ -43,35 +41,24 @@ class Menu extends Component {
                                       };
                                       
                                       axios.request(options).then(response => {
-                                        console.log(response.data);
-                        
-                                        
                         
                                         // Set the time that the access token will expire at
                                         let expiresAt = (response.data.expires_in * 1000) + new Date().getTime();
-                        
-                                        console.log(expiresAt);
-                        
-                                        //console.log(response.data.access_token);
-                                        //console.log(response.data.id_token);
                                         this.accessToken = response.data.access_token;
                                         this.refreshToken = response.data.refresh_token;
                                         this.expiresAt = expiresAt;
-                                        console.log(this.expiresAt);
+                                        
                                         localStorage.setItem('accessToken', this.accessToken);
                                         localStorage.setItem('refreshToken', this.refreshToken);
                                         localStorage.setItem('isLoggedIn', 'true');
                                         localStorage.setItem('expiresAt', this.expiresAt);
                                         this.componentDidMount ();
-                                        //this.isAuthenticated();
-                                        //window.location.reload(false);
+                                        
                                       }).catch(error => {
                                         this.logout();
                                         document.location.href="/";
                                         console.error(error);
                                       });
-
-
 
                                 }
                                 this.setState({ message: error.message })

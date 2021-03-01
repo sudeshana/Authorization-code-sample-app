@@ -17,7 +17,6 @@ export default class Auth {
     }
 
     login() {
-        //var url = AUTH_CONFIG.authUrl + "?response_type=id_token token&client_id=" + AUTH_CONFIG.clientId + "&scope=openid&nonce=13e2312637dg136e1&";
         var url = AUTH_CONFIG.authUrl + "?response_type=code&client_id=" + AUTH_CONFIG.clientId + "&scope=openid&&state=fa04438a996f&";
         var redirectUrl = "redirect_uri=" + AUTH_CONFIG.callbackUrl;
         url = url + redirectUrl;
@@ -28,7 +27,6 @@ export default class Auth {
         console.log("handling the response received from APIM");
         console.log(queryString);
         const authResult = queryString.parse(window.location.search);
-        console.log(authResult);
 
         if (authResult && authResult.code && authResult.state){
             this.authorizationCode = authResult.code;
@@ -42,27 +40,19 @@ export default class Auth {
               };
               
               axios.request(options).then(response => {
-                console.log(response.data);
-
-                
 
                 // Set the time that the access token will expire at
                 let expiresAt = (response.data.expires_in * 1000) + new Date().getTime();
-
-                console.log(expiresAt);
-
-                //console.log(response.data.access_token);
-                //console.log(response.data.id_token);
                 this.accessToken = response.data.access_token;
                 this.refreshToken = response.data.refresh_token;
                 this.idToken = response.data.id_token;
                 this.expiresAt = expiresAt;
-                console.log(this.expiresAt);
+            
                 localStorage.setItem('accessToken', this.accessToken);
                 localStorage.setItem('refreshToken', this.refreshToken);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('expiresAt', this.expiresAt);
-                //this.isAuthenticated();
+        
                 window.location.reload(false);
               }).catch(error => {
                 console.error(error);
@@ -73,22 +63,6 @@ export default class Auth {
             console.log("An error occurred while authentication.");
             alert(`Error: Check the console for further details.`);
         }
-
-       /* if(authResult && authResult.access_token && authResult.id_token) {
-            // Set isLoggedIn flag in localStorage
-            localStorage.setItem('isLoggedIn', 'true');
-
-            // Set the time that the access token will expire at
-            let expiresAt = (authResult.expires_in * 1000) + new Date().getTime();
-            this.accessToken = authResult.access_token;
-            this.idToken = authResult.id_token;
-            this.expiresAt = expiresAt;
-
-            localStorage.setItem('accessToken', this.accessToken);
-        } else {
-            console.log("An error occurred while authentication.");
-            alert(`Error: Check the console for further details.`);
-        }*/
     }
 
     logout() {
@@ -104,13 +78,6 @@ export default class Auth {
     }
 
     isAuthenticated() {
-        // Check whether the current time is past the
-        // access token's expiry time
-        /*let expiresAt = this.expiresAt;
-        console.log('expiresAt,', expiresAt);
-        console.log('now,', new Date().getTime());
-        console.log(new Date().getTime() < expiresAt);
-        return new Date().getTime() < expiresAt; */
         return JSON.parse(localStorage.getItem('isLoggedIn')) === true; 
     }
 
